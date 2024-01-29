@@ -1,10 +1,10 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom';  // Importa ReactDOM de esta manera
+import './index.css';  // Mueve la importación del archivo de estilo fuera de la instrucción 'import'
+import UserList from './components/UserList';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <UserList />
   </React.StrictMode>,
-)
+);

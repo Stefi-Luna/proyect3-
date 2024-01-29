@@ -1,73 +1,91 @@
-import { useState, useEffect } from "react";
+import React, { useState } from 'react';
 
+const UserList = () => {
+  const [userList, setUserList] = useState([]);
+  const [inputValues, setInputValues] = useState({
+    userName: '',
+    userSurname1: '',
+    userSurname2: '',
+    userEmail: '',
+    userPhone: ''
+  });
 
-return(
-        <>
-        <html lang="en">
+  const handleInputChange = (e) => {
+    setInputValues({
+      ...inputValues,
+      [e.target.name]: e.target.value
+    });
+  };
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado Escolar</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="shortcut icon" href="img/escudo.svg" type="image/x-icon">
-</head>
+  const handleAddUserToList = () => {
+    const { userName, userSurname1, userSurname2, userEmail, userPhone } = inputValues;
+    const user = `${userName} ${userSurname1} ${userSurname2} - ${userEmail} - ${userPhone}`;
+    setUserList([...userList, user]);
+    cleanFields();
+  };
 
-<body class="formBody">
-    <header class="formBody--header">
-        <a href="index.html"><img src="img/escudo.svg" alt="Escudo escuela" class="escudo"></a>
-        <h1>Listado escolar</h1>
-        <button onclick="location.href='index.html'">Ir atrás</button>
-    </header>
+  const cleanFields = () => {
+    setInputValues({
+      userName: '',
+      userSurname1: '',
+      userSurname2: '',
+      userEmail: '',
+      userPhone: ''
+    });
+  };
 
-    <main class="formMain">
-        <section>
-            <section class="form">
-                <label for="name">Nombre</label>
-                <input type="text" name="" id="name">
-                <label for="lastName1">Primer apellido</label>
-                <input type="text" name="" id="lastName1">
-                <label for="lastName2">Segundo apellido</label>
-                <input type="text" name="" id="lastName2">
-                <label for="category">Categoría</label>
-                <select name="" id="category">
-                    <option value="" disabled selected>Elige</option>
-                    <option value="estudiante">Estudiante</option>
-                    <option value="docente">Docente</option>
-                    <option value="pas">PAS</option>
-                </select>
-                <label for="course">Curso</label>
-                <input type="number" name="" id="course" min="0" max="10" pattern="\d{2}" maxlength="2"
-                    title="Escribe un número" placeholder="Ej.: 3" disabled>
-                <label for="email">E-mail</label>
-                <input type="email" name="" id="email" placeholder="Ej.: hola@hola.com">
-                <label for="class">Clase</label>
-                <input type="text" name="" id="class" disabled>
-                <button onclick="getInfoCreateObject()" class="btnAdd">Enviar</button>
+  console.log(userList);
+
+  return (
+    <>
+      <div className="formBody">
+        <nav className="formBody--header">
+          <a href="index.html"><img src="../img/escudo.svg" alt="Escudo escuela" className="escudo" /></a>
+          <h1>Listado escolar</h1>
+        </nav>
+
+        <main className="formMain">
+          <section>
+            <section className="form">
+              <label htmlFor="userName">Name</label>
+              <input type="text" name="userName" value={inputValues.userName} onChange={handleInputChange} />
+
+              <label htmlFor="userSurname1">First Surname</label>
+              <input type="text" name="userSurname1" value={inputValues.userSurname1} onChange={handleInputChange} />
+
+              <label htmlFor="userSurname2">Second Surname</label>
+              <input type="text" name="userSurname2" value={inputValues.userSurname2} onChange={handleInputChange} />
+
+              <label htmlFor="userEmail">Email</label>
+              <input type="text" name="userEmail" value={inputValues.userEmail} onChange={handleInputChange} />
+
+              <label htmlFor="userPhone">Phone Number</label>
+              <input type="text" name="userPhone" value={inputValues.userPhone} onChange={handleInputChange} />
+
+              <button onClick={handleAddUserToList}>Añadir usuario</button>
             </section>
+          </section>
 
-            <section id="list">
+          <section className="list">
+            <ul>
+              {userList.map((user, index) => (
+                <li key={index}>{user}</li>
+              ))}
+            </ul>
+          </section>
 
-            </section>
-        </section>
+          <section className="listButtons">
+            <button onClick={() => addAlertInfo()}>Cargar lista</button>
+            <button onClick={() => savedList()}>Guardar lista</button>
+          </section>
+        </main>
 
-        <section id="listButtons">
-            <button onclick="addAlertInfo()">Cargar lista</button>
-            <button onclick="savedList()"> Guardar lista</button>
-        </section>
-    </main>
-
-    <footer>
-        <section>© Fem-Coders</section>
-    </footer>
-
-    <script src="/js/script.js"></script>
-</body>
-
-</html>
-        </>
-        
-    )
-}
+        <footer>
+          <section>© Fem-Coders</section>
+        </footer>
+      </div>
+    </>
+  );
+};
 
 export default UserList;
