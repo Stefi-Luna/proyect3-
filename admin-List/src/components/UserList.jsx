@@ -10,6 +10,8 @@ const UserList = () => {
     userPhone: ''
   });
 
+  const [editingIndex, setEditingIndex] = useState(null);
+
   const handleInputChange = (e) => {
     setInputValues({
       ...inputValues,
@@ -17,11 +19,52 @@ const UserList = () => {
     });
   };
 
-  const handleAddUserToList = () => {
+ const handleAddUserToList = () => {
     const { userName, userSurname1, userSurname2, userEmail, userPhone } = inputValues;
     const user = `${userName} ${userSurname1} ${userSurname2} - ${userEmail} - ${userPhone}`;
-    setUserList([...userList, user]);
+
+    // Validación del campo numérico
+  if (isNaN(userPhone) || userPhone.length < 9) {
+    alert('Por favor, ingrese un número de teléfono válido.');
+    return;
+  }
+
+  // Validación del campo de correo electrónico
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(userEmail)) {
+    alert('Por favor, ingrese una dirección de correo electrónico válida.');
+    return;
+  }
+
+    if (editingIndex !== null) {
+      const updatedUserList = [...userList];
+      updatedUserList[editingIndex] = user;
+      setUserList(updatedUserList);
+      setEditingIndex(null);
+    } else {
+      setUserList([...userList, user]);
+    }
+
     cleanFields();
+  };
+
+  const handleEditUser = (index) => {
+    const userToEdit = userList[index].split(' - ');
+    const [name, surname1, surname2] = userToEdit[0].split(' ');
+    setInputValues({
+      userName: name || '',
+      userSurname1: surname1 || '',
+      userSurname2: surname2 || '',
+      userEmail: userToEdit[1] || '',
+      userPhone: userToEdit[2] || ''
+    });
+    setEditingIndex(index);
+  };
+  
+ const handleDeleteUser = (index) => {
+    const updatedUserList = [...userList];
+    updatedUserList.splice(index, 1);
+    setUserList(updatedUserList);
   };
 
   const cleanFields = () => {
@@ -69,7 +112,10 @@ const UserList = () => {
           <section className="list">
             <ul>
               {userList.map((user, index) => (
-                <li key={index}>{user}</li>
+                <li key={index}>{user}
+                <button onClick={() => handleDeleteUser(index)}>Eliminar</button>
+                <button onClick={() => handleEditUser(index)}>Editar</button>
+                </li>
               ))}
             </ul>
           </section>
