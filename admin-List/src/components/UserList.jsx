@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { userService } from '../server/config';
+
+const { getUsers, createUser, deleteUser } = userService
 
 const UserList = () => {
   const [userList, setUserList] = useState([]);
@@ -19,9 +22,9 @@ const UserList = () => {
     });
   };
 
- const handleAddUserToList = () => {
+ const handleAddUserToList = async () => {
     const { userName, userSurname1, userSurname2, userEmail, userPhone } = inputValues;
-    const user = `${userName} ${userSurname1} ${userSurname2} - ${userEmail} - ${userPhone}`;
+    //const user = `${userName} ${userSurname1} ${userSurname2} - ${userEmail} - ${userPhone}`;
 
     // Validación del campo numérico
   if (isNaN(userPhone) || userPhone.length < 9) {
@@ -36,14 +39,20 @@ const UserList = () => {
     return;
   }
 
-    if (editingIndex !== null) {
-      const updatedUserList = [...userList];
-      updatedUserList[editingIndex] = user;
-      setUserList(updatedUserList);
-      setEditingIndex(null);
-    } else {
-      setUserList([...userList, user]);
-    }
+  const status = await createUser (inputValues);
+ 
+  const users = await getUsers()
+    setUserList(users)
+  if (status === 201) {alert('Usuario creado jijijii con exito')};
+
+    //if (editingIndex !== null) {
+      //const updatedUserList = [...userList];
+     // updatedUserList[editingIndex] = user;
+    //  setUserList(updatedUserList);
+     // setEditingIndex(null);
+   // } else {
+   //   setUserList([...userList, user]);
+  //  }
 
     cleanFields();
   };
@@ -61,10 +70,14 @@ const UserList = () => {
     setEditingIndex(index);
   };
   
- const handleDeleteUser = (index) => {
-    const updatedUserList = [...userList];
-    updatedUserList.splice(index, 1);
-    setUserList(updatedUserList);
+ const handleDeleteUser = async (userId) => {
+    const status = await deleteUser(userId);
+    const users = await getUsers()
+    setUserList(users)
+
+    if (status === 200 ){
+      alert('El usuario se ha eliminado con exito')
+    }
   };
 
   const cleanFields = () => {
@@ -76,6 +89,12 @@ const UserList = () => {
       userPhone: ''
     });
   };
+
+
+  const fetchUser = async () => {
+    const users = await getUsers()
+    setUserList(users)
+  }
 
   console.log(userList);
 
@@ -91,7 +110,7 @@ const UserList = () => {
           <section>
             <section className="form">
               <label htmlFor="userName">Name</label>
-              <input type="text" name="userName" value={inputValues.userName} onChange={handleInputChange} />
+              <input type="text" name="userName" value={inputValues.userName} onChange={handleInputChange} required />
 
               <label htmlFor="userSurname1">First Surname</label>
               <input type="text" name="userSurname1" value={inputValues.userSurname1} onChange={handleInputChange} />
@@ -103,7 +122,7 @@ const UserList = () => {
               <input type="text" name="userEmail" value={inputValues.userEmail} onChange={handleInputChange} />
 
               <label htmlFor="userPhone">Phone Number</label>
-              <input type="text" name="userPhone" value={inputValues.userPhone} onChange={handleInputChange} />
+              <input type="number" name="userPhone" value={inputValues.userPhone} onChange={handleInputChange} required />
 
               <button onClick={handleAddUserToList}>Añadir usuario</button>
             </section>
@@ -112,8 +131,8 @@ const UserList = () => {
           <section className="list">
             <ul>
               {userList.map((user, index) => (
-                <li key={index}>{user}
-                <button onClick={() => handleDeleteUser(index)}>Eliminar</button>
+                <li key={index}>{user.userName} - {user.userEmail}
+                <button onClick={() => handleDeleteUser(user.id)}>Eliminar</button>
                 <button onClick={() => handleEditUser(index)}>Editar</button>
                 </li>
               ))}
@@ -121,7 +140,7 @@ const UserList = () => {
           </section>
 
           <section className="listButtons">
-            <button onClick={() => addAlertInfo()}>Cargar lista</button>
+            <button onClick={() => fetchUser()}>Cargar lista</button>
             <button onClick={() => savedList()}>Guardar lista</button>
           </section>
         </main>
