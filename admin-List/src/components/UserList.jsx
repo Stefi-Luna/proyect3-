@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { userService } from '../server/config';
 import swal from 'sweetalert';
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { getUsers, createUser, deleteUser, updateUser } = userService
@@ -128,11 +129,11 @@ const UserList = () => {
               <label htmlFor="userPhone">Phone Number</label>
               <input type="number" name="userPhone" value={inputValues.userPhone} onChange={handleInputChange} />
 
-              <button onClick={handleAddUserToList}>{buttonText}</button>
+              <Button style={{ backgroundColor: '#EBDEF0', color: 'black' }} onClick={handleAddUserToList}>{buttonText}</Button>
             </section>
           </section>
 
-             <Table striped bordered hover>
+             <Table striped bordered hover size="sm" responsive="lg">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -141,8 +142,8 @@ const UserList = () => {
                     <th>Segundo Apellido</th>
                     <th>Email</th>
                     <th>Telefono</th>
-                    <th>Editar</th>
-                    <th>Eliminar</th>
+                    <th></th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -167,26 +168,24 @@ const UserList = () => {
                         {user.userPhone}
                       </td>
                       <td>
-                          <button onClick={() => handleEditUser(user.id)}>Editar</button>
+                          <Button variant="outline-info" size="sm" onClick={() => handleEditUser(user.id)}>Editar</Button>
                       </td>
                       <td>
-                          <button onClick={() => handleDeleteUser(user.id)}>Eliminar</button>
+                          <Button variant="outline-danger" size="sm" onClick={() => handleDeleteUser(user.id)}>Eliminar</Button>
                       </td>
                     </tr>
                     
                  ))}
                 </tbody>
             </Table>
-            <ul>
-             
-            </ul>
 
           <section className="listButtons">
-            <button onClick={() => fetchUser()}>Cargar lista</button>
+            <Button variant="light" onClick={() => fetchUser()}>Cargar lista</Button>
+            <Button variant="light" onClick={() => savedList()}>Guardar lista</Button>
           </section>
         </main>
 
-        <footer>
+        <footer className='footer'>
           <section>© Fem-Coders</section>
         </footer>
       </div>
