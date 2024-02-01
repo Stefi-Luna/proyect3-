@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';  // Importa ReactDOM de esta manera
+import ReactDOM from 'react-dom/client';  // Importa ReactDOM de esta manera
 import './index.css';  // Mueve la importación del archivo de estilo fuera de la instrucción 'import'
 import UserList from './components/UserList';
 

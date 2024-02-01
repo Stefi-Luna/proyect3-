@@ -1,3 +1,20 @@
 {
-  "users": []
+  "users": [
+    {
+      "userName": "GERMAN ROGER",
+      "userSurname1": "CECCONELLO",
+      "userSurname2": "DE LA FUENTE",
+      "userEmail": "CHECO_19_16@HOTMAIL.COM",
+      "userPhone": "611158771",
+      "id": "8c16"
+    },
+    {
+      "id": "4b19",
+      "userName": "MAXIMILIANO",
+      "userSurname1": "PEZZOTTA",
+      "userSurname2": "ACEVEDO",
+      "userEmail": "POLLO@GMAIL.COM",
+      "userPhone": "611235879"
+    }
+  ]
 }

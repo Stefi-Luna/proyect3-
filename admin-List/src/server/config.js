@@ -24,6 +24,11 @@ const userService = {
         const { status } = await api.delete(`/users/${id}`)
         return status
     },
+
+    updateUser: async(body) => {
+        const { status } = await api.put(`/users/${body.id}`, body)
+        return status
+    }
 }
 
 export { userService }

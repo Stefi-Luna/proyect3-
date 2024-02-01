@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { userService } from '../server/config';
+import swal from 'sweetalert';
+import Table from 'react-bootstrap/Table';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const { getUsers, createUser, deleteUser } = userService
+const { getUsers, createUser, deleteUser, updateUser } = userService
 
 const UserList = () => {
   const [userList, setUserList] = useState([]);
@@ -10,10 +13,15 @@ const UserList = () => {
     userSurname1: '',
     userSurname2: '',
     userEmail: '',
-    userPhone: ''
+    userPhone: '',
   });
 
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const fetchUser = async () => {
+    const users = await getUsers()
+    setUserList(users)
+  }
 
   const handleInputChange = (e) => {
     setInputValues({
@@ -23,60 +31,61 @@ const UserList = () => {
   };
 
  const handleAddUserToList = async () => {
-    const { userName, userSurname1, userSurname2, userEmail, userPhone } = inputValues;
-    //const user = `${userName} ${userSurname1} ${userSurname2} - ${userEmail} - ${userPhone}`;
+    const {userEmail, userPhone } = inputValues;
 
     // Validación del campo numérico
   if (isNaN(userPhone) || userPhone.length < 9) {
-    alert('Por favor, ingrese un número de teléfono válido.');
+    swal("Atención",'Por favor, ingrese un número de teléfono válido.', "error");
     return;
   }
 
   // Validación del campo de correo electrónico
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(userEmail)) {
-    alert('Por favor, ingrese una dirección de correo electrónico válida.');
+    swal("Atención", 'Por favor, ingrese una dirección de correo electrónico válida.', "error");
     return;
   }
 
-  const status = await createUser (inputValues);
+  let statusCode
+  if (isEditMode) {
+     statusCode = await updateUser(inputValues);
+  } else{
+    statusCode = await createUser(inputValues);
+  }
  
-  const users = await getUsers()
-    setUserList(users)
-  if (status === 201) {alert('Usuario creado jijijii con exito')};
-
-    //if (editingIndex !== null) {
-      //const updatedUserList = [...userList];
-     // updatedUserList[editingIndex] = user;
-    //  setUserList(updatedUserList);
-     // setEditingIndex(null);
-   // } else {
-   //   setUserList([...userList, user]);
-  //  }
-
-    cleanFields();
+  const text = isEditMode ? "actualizado" : "creado"
+  if (statusCode === 201 || statusCode === 200) {
+    swal("Éxito", `Usuario ${text} con éxito`, "success")
   };
 
-  const handleEditUser = (index) => {
-    const userToEdit = userList[index].split(' - ');
-    const [name, surname1, surname2] = userToEdit[0].split(' ');
-    setInputValues({
-      userName: name || '',
-      userSurname1: surname1 || '',
-      userSurname2: surname2 || '',
-      userEmail: userToEdit[1] || '',
-      userPhone: userToEdit[2] || ''
-    });
-    setEditingIndex(index);
-  };
+  fetchUser();
+
+  cleanFields();
+  setIsEditMode(false);
+};
+
+  const handleEditUser = async (id) => {
+  setIsEditMode(true)
+  const userToEdit = userList.find(person => person.id === id)
+  const {userName, userSurname1, userSurname2, userEmail, userPhone} = userToEdit || {};
+
+  setInputValues({
+    userName: userName || '',
+    userSurname1: userSurname1 || '',
+    userSurname2: userSurname2 || '',
+    userEmail: userEmail || '',
+    userPhone: userPhone || '',
+    id
+  });
+
+};
   
  const handleDeleteUser = async (userId) => {
     const status = await deleteUser(userId);
-    const users = await getUsers()
-    setUserList(users)
+    fetchUser();
 
     if (status === 200 ){
-      alert('El usuario se ha eliminado con exito')
+      swal("Éxito", 'El usuario se ha eliminado con exito', "success")
     }
   };
 
@@ -90,13 +99,8 @@ const UserList = () => {
     });
   };
 
-
-  const fetchUser = async () => {
-    const users = await getUsers()
-    setUserList(users)
-  }
-
-  console.log(userList);
+  //operación ternaria ??
+ const buttonText = isEditMode ? "Editar usuario" : "Añadir usuario"
 
   return (
     <>
@@ -110,7 +114,7 @@ const UserList = () => {
           <section>
             <section className="form">
               <label htmlFor="userName">Name</label>
-              <input type="text" name="userName" value={inputValues.userName} onChange={handleInputChange} required />
+              <input type="text" name="userName" value={inputValues.userName} onChange={handleInputChange} />
 
               <label htmlFor="userSurname1">First Surname</label>
               <input type="text" name="userSurname1" value={inputValues.userSurname1} onChange={handleInputChange} />
@@ -122,26 +126,63 @@ const UserList = () => {
               <input type="text" name="userEmail" value={inputValues.userEmail} onChange={handleInputChange} />
 
               <label htmlFor="userPhone">Phone Number</label>
-              <input type="number" name="userPhone" value={inputValues.userPhone} onChange={handleInputChange} required />
+              <input type="number" name="userPhone" value={inputValues.userPhone} onChange={handleInputChange} />
 
-              <button onClick={handleAddUserToList}>Añadir usuario</button>
+              <button onClick={handleAddUserToList}>{buttonText}</button>
             </section>
           </section>
 
-          <section className="list">
+             <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Segundo Apellido</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                   {userList.map((user, index) => (
+                    <tr key={index}>
+                      <td>
+                        {user.id}
+                      </td>
+                      <td>
+                        {user.userName}
+                      </td>
+                      <td>
+                         {user.userSurname1}
+                      </td>
+                      <td>
+                         {user.userSurname2}
+                      </td>
+                      <td>
+                        {user.userEmail}
+                      </td>
+                       <td>
+                        {user.userPhone}
+                      </td>
+                      <td>
+                          <button onClick={() => handleEditUser(user.id)}>Editar</button>
+                      </td>
+                      <td>
+                          <button onClick={() => handleDeleteUser(user.id)}>Eliminar</button>
+                      </td>
+                    </tr>
+                    
+                 ))}
+                </tbody>
+            </Table>
             <ul>
-              {userList.map((user, index) => (
-                <li key={index}>{user.userName} - {user.userEmail}
-                <button onClick={() => handleDeleteUser(user.id)}>Eliminar</button>
-                <button onClick={() => handleEditUser(index)}>Editar</button>
-                </li>
-              ))}
+             
             </ul>
-          </section>
 
           <section className="listButtons">
             <button onClick={() => fetchUser()}>Cargar lista</button>
-            <button onClick={() => savedList()}>Guardar lista</button>
           </section>
         </main>
 
