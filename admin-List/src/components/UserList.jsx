@@ -37,14 +37,15 @@ const UserList = () => {
     // Validación del campo numérico
   if (isNaN(userPhone) || userPhone.length < 9) {
     swal("Atención",'Por favor, ingrese un número de teléfono válido.', "error");
-    return;
+    return; 
   }
 
   // Validación del campo de correo electrónico
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(userEmail)) {
     swal("Atención", 'Por favor, ingrese una dirección de correo electrónico válida.', "error");
-    return;
+    return; 
+  
   }
 
   let statusCode
